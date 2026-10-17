@@ -36,3 +36,16 @@ At zoom factor `z`, visible size is approximately `source / z`; center coordinat
 - HP T520 remains useful for low-load UI tests, not as the performance reference for heavy 5 MP HEVC.
 
 See `ROADMAP.md`, `STATUS.md` and `docs/ARCHITECTURE.md`.
+
+## Current MVP
+
+The first standalone implementation is a Win32 VLC interface plugin:
+
+```text
+plugins\\control\\libxmeyezoom_plugin.dll
+vlc.exe --extraintf=xmeyezoom
+```
+
+Interaction is intentionally separated from the XMEye demux. The floating controller provides a visual ROI map: drag the ROI to pan, use the mouse wheel or slider to change zoom, auto-detect source W/H when possible, or type W/H manually as an override. The control window can remain always-on-top for dual-monitor work.
+
+Direct mouse interaction on the actual VLC video window remains the next layer; it will only be enabled explicitly so normal VLC mouse behavior is preserved when interactive mode is off.
