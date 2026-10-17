@@ -1,0 +1,48 @@
+name: build-interactive-zoom-win64
+
+on:
+  push:
+    branches: [dev/interactive-zoom, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build only interactive zoom plugin
+        run: |
+          mkdir -p out
+          docker run --rm \
+            --user 0:0 \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -w /work \
+            registry.videolan.org/vlc-debian-win64-3.0:20260820114402 \
+            bash -lc '
+              set -eux
+              rm -rf vlc-build
+              git clone --depth 1 --branch 3.0.24 https://github.com/videolan/vlc.git vlc-build
+              cp src/xmeye_zoom_win32.c vlc-build/modules/control/xmeye_zoom_win32.c
+              printf "\nlibxmeyezoom_plugin_la_SOURCES = control/xmeye_zoom_win32.c\nlibxmeyezoom_plugin_la_LIBADD = -lgdi32 -lshell32 -lcomctl32\nif HAVE_WIN32_DESKTOP\ncontrol_LTLIBRARIES += libxmeyezoom_plugin.la\nendif\n" >> vlc-build/modules/control/Makefile.am
+              cd vlc-build
+              export VLC_PREBUILT_CONTRIBS_URL=https://artifacts.videolan.org/vlc-3.0/win64/vlc-contrib-x86_64-w64-mingw32-910cc9cada6080dd777fbafb2ebdd0c24f702c30.tar.zst
+              python3 ../ci/add_zoom_preflight.py extras/package/win32/build.sh
+              extras/package/win32/build.sh -a x86_64 -p
+              DLL=$(find . -type f -name libxmeyezoom_plugin.dll | head -n 1)
+              test -n "$DLL"
+              x86_64-w64-mingw32-strip --strip-unneeded "$DLL" || true
+              mv "$DLL" /work/out/libxmeyezoom_plugin.dll
+            '
+
+      - name: Record build metadata
+        run: |
+          sha256sum out/libxmeyezoom_plugin.dll > out/SHA256SUMS.txt
+          printf 'VLC base: 3.0.24 x64\nPlugin: XMEye Interactive Zoom\nInstall: plugins/control/libxmeyezoom_plugin.dll\nShortcut: xmeyezoom\nLaunch: vlc.exe --extraintf=xmeyezoom\nAuthor: Álvaro Ibarz - https://github.com/aibarz\n' > out/BUILD-INFO.txt
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: vlc-3.0.24-xmeye-interactive-zoom-win64
+          path: out/
