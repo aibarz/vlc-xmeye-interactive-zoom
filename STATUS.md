@@ -50,3 +50,13 @@ Start with the crop/autoscale model because it is already proven inside VLC. Imp
 - This validates module discovery/loading and the standalone UI path on the T520 without loading video.
 - ASUS remains the functional validation target for live 5 MP zoom/pan behavior.
 - Packaging scripts now auto-detect common VLC locations before falling back to an explicit path argument.
+
+## 2026-10-17 — XMEye Desk bundle
+
+- ASUS runtime validation confirmed the interactive zoom MVP works correctly during real XMEye playback.
+- A second floating interface, `xmeyecontrol`, is now bundled alongside `xmeyezoom` for dual-monitor control.
+- The bundle includes the five extension filters used by the floating control panel: Static Gate, Deblock, Deconv, Gray Guard and Focus.
+- Combined launcher: `START-VLC-XMEYE-DESK.cmd` -> `--extraintf=xmeyezoom:xmeyecontrol`.
+- Combined installer backs up same-name existing plugins before replacement; removal restores backups.
+- Both interface modules were loaded together successfully on VLC 3.0.24 x64 without opening media.
+- The validated XMEye demux/AVI DLLs remain outside this project and are not modified.

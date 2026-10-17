@@ -49,3 +49,13 @@ vlc.exe --extraintf=xmeyezoom
 Interaction is intentionally separated from the XMEye demux. The floating controller provides a visual ROI map: drag the ROI to pan, use the mouse wheel or slider to change zoom, auto-detect source W/H when possible, or type W/H manually as an override. The control window can remain always-on-top for dual-monitor work.
 
 Direct mouse interaction on the actual VLC video window remains the next layer; it will only be enabled explicitly so normal VLC mouse behavior is preserved when interactive mode is off.
+
+## XMEye Desk bundle
+
+For dual-monitor work, the package also contains the floating `xmeyecontrol` interface and the five XMEye video filters it controls. `START-VLC-XMEYE-DESK.cmd` launches VLC with both floating interfaces enabled:
+
+```text
+--extraintf=xmeyezoom:xmeyecontrol
+```
+
+This keeps the playback window on one display while zoom/pan and XMEye filter controls can remain on the other. The demux/AVI integration stays separate and unchanged.
